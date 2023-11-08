@@ -14,12 +14,13 @@ const KanbanBoard = require("../model/BoardModel.js");
     // Create a new KanbanBoard document
 
 router.post("/store", async (req, res) => {
-  const { name, description, columns } = req.body;
-  console.log(name, description, "to be saved");
+  const { name, description, type } = req.body;
   try {
     const newBoard = new KanbanBoard({
       name,
       description,
+      type
+
     });
 
     // Save the new board to MongoDB
@@ -35,11 +36,12 @@ router.post("/store", async (req, res) => {
 
 // Route to create a new Kanban board
 router.post("/create", (req, res) => {
-  const { name, description } = req.body;
+  const { name, description,type } = req.body;
   const newBoard = {
     id: boards.length + 1,
     name,
     description,
+    type
   };
   boards.push(newBoard);
   res.json(newBoard);
@@ -50,9 +52,15 @@ router.post("/create", (req, res) => {
 // Route to get a list of all Kanban boards
 router.get("/getData", async(req, res) => {
     try {
-        // Use the mongoose Model to find all boards
-        const boards = await KanbanBoard.find();
+
+    const { type } = req.query; 
+    let query = {}; 
     
+    if (type) {
+      query.type = type;
+    }
+    
+    const boards = await KanbanBoard.find(query);
         res.json(boards);
       } catch (error) {
         console.error(error);
@@ -78,7 +86,6 @@ router.put("/:id", (req, res) => {
 
 
 // Route to delete a Kanban board by ID
-export default deleteObject=(id)=>{
     router.delete("/:id", async(req, res) => {
         const boardId = req.params.id;
     
@@ -97,41 +104,7 @@ export default deleteObject=(id)=>{
     
         return res.status(500).json({ error: 'Error deleting board' });
       }
-    //   const id = req.params.id;
-    //   console.log(id,"id");
-    //   const indexToRemove = boards.findIndex((board) => board.id === id);
-    //   if (indexToRemove === -1) {
-    //     return res.status(404).json({ message: "Board not found" });
-    //   }
-    //   boards.splice(indexToRemove, 1);
-    //   res.json({ message: "Board deleted" });
+
     });
-}
-// router.delete("/:id", async(req, res) => {
-//     const boardId = req.params.id;
 
-//   try {
-//     const deletedBoard = await KanbanBoard.deleteOne({ _id: boardId });
-
-//     // const deletedBoard = await KanbanBoard.deleteOne({"_id": `ObjectId(${boardId})`});
-//     console.log(deletedBoard,"queryyyy")
-//     if (!deletedBoard) {
-//       return res.status(404).json({ message: 'Board not found' });
-//     }
-//     return res.json({ message: 'Board deleted' });
-//   } catch (error) {
-//     console.error(error);
-//     console.log(deletedBoard,"queryyyy")
-
-//     return res.status(500).json({ error: 'Error deleting board' });
-//   }
-// //   const id = req.params.id;
-// //   console.log(id,"id");
-// //   const indexToRemove = boards.findIndex((board) => board.id === id);
-// //   if (indexToRemove === -1) {
-// //     return res.status(404).json({ message: "Board not found" });
-// //   }
-// //   boards.splice(indexToRemove, 1);
-// //   res.json({ message: "Board deleted" });
-// });
 exports.default = router;
