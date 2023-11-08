@@ -1,50 +1,47 @@
-import React from 'react';
-import Cards from '../cards/cards';
-import './styleSheet.scss';
+import React, { useEffect, useState } from "react";
+import Cards from "../cards/cards";
+import "./styleSheet.scss";
+import axios from "axios";
 
 interface TodoItem {
   name: string;
   description: string;
-  date: string;
+  _id: any;
 }
 
 const Inprogress: React.FC = () => {
-  const demoData: TodoItem[] = [
-    {
-      name: 'Suraj',
-      description:
-        'Making queries that are to be asked and also the answers that should be displayed, keywords based as the meaning should be the same, Checking the answer, i.e., the summary which is displayed in the output if it is correct factually, logically & semantically',
-      date: '19/11/2023',
-    },
-    {
-      name: 'Shubham',
-      description:
-        'Making queries that are to be asked and also the answers that should be displayed, keywords based as the meaning should be the same, Checking the answer, i.e., the summary which is displayed in the output if it is correct factually, logically & semantically',
-      date: '19/11/2023',
-    },
-    {
-      name: 'Saurabh',
-      description:
-        'Making queries that are to be asked and also the answers that should be displayed, keywords based as the meaning should be the same, Checking the answer, i.e., the summary which is displayed in the output if it is correct factually, logically & semantically',
-      date: '19/11/2023',
-    },
-    {
-      name: 'Aniket',
-      description:
-        'Making queries that are to be asked and also the answers that should be displayed, keywords based as the meaning should be the same, Checking the answer, i.e., the summary which is displayed in the output if it is correct factually, logically & semantically',
-      date: '19/11/2023',
-    },
-  ];
+  const [allData, setAllData] = useState<TodoItem[]>([]);
 
+  useEffect(() => {
+    const apiUrl = "http://localhost:3005/api/boards/getData?type=inprogress";
+
+    axios
+      .get(apiUrl)
+      .then((response) => {
+        setAllData(response.data);
+      })
+      .catch((error) => {
+        console.error("API request error:", error);
+      });
+  }, []);
   const showResult = () => {
-    return demoData?.map((e) => (
-      <Cards name={e.name} description={e.description} date={e.date} key={e.name} />
+    return allData?.map((e) => (
+      <Cards
+        name={e.name}
+        description={e.description}
+        id={e._id}
+        key={e.name}
+      />
     ));
   };
 
   return (
-    <div className='head'>
-      {showResult()}
+    <div className="head">
+      {allData.length > 0 ? (
+        showResult()
+      ) : (
+        <div style={{ marginTop: "10px", fontSize: "18px" }}>No Data</div>
+      )}
     </div>
   );
 };

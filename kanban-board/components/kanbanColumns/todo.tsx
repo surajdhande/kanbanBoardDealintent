@@ -7,41 +7,41 @@ import axios from "axios";
 interface TodoItem {
   name: string;
   description: string;
-  date: string;
+  _id: any;
 }
 
 const Todo: React.FC = () => {
   const [allData, setAllData] = useState<TodoItem[]>([]);
 
   useEffect(() => {
-    // Define the API URL
-    const apiUrl = "http://localhost:3005/api/boards/getData"; // Replace with your API URL
+    const apiUrl = "http://localhost:3005/api/boards/getData?type=todo";
 
-    // Make a GET request when the component mounts
     axios
       .get(apiUrl)
       .then((response) => {
-        // Handle the successful response
-        setAllData(response.data); // Update the state with the fetched data
+        setAllData(response.data);
       })
       .catch((error) => {
-        // Handle any errors here
         console.error("API request error:", error);
       });
   }, []);
 
   const showResult = () => {
     return allData?.map((e, index) => (
-      <Cards
-        name={e.name}
-        description={e.description}
-        date={e.date}
-        key={index} // Use index as the key since it should be unique
-      />
+      <Cards name={e.name} description={e.description} key={index} id={e._id} />
     ));
   };
 
-  return <div className="todo-head">{showResult()}</div>;
+  return (
+    <div className="todo-head">
+      {" "}
+      {allData.length > 0 ? (
+        showResult()
+      ) : (
+        <div style={{ marginTop: "10px", fontSize: "18px" }}>No Data</div>
+      )}
+    </div>
+  );
 };
 
 export default Todo;
